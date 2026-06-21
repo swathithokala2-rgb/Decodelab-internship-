@@ -61,10 +61,20 @@ const Contact = mongoose.model("Contact", contactSchema);
 const Order = mongoose.model("Order", orderSchema);
 const User = mongoose.model("User", userSchema);
 
+
 // ======================================
 // GET BOOK BY ID
 // ======================================
-
+app.get("/api/books", async (req, res) => {
+  try {
+    const books = await Book.find();
+    res.json(books);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+});
 app.get("/api/books/:id", async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
