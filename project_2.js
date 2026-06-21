@@ -45,27 +45,21 @@ const orderSchema = new mongoose.Schema({
   total: Number
 });
 
-const Book = mongoose.model("Book", bookSchema);
-const Contact = mongoose.model("Contact", contactSchema);
-const Order = mongoose.model("Order", orderSchema);
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
-    password: String
+    password: String,
+    address: String,
+    city: String,
+    state: String,
+    pincode: String,
+    phone: String
 });
 
+const Book = mongoose.model("Book", bookSchema);
+const Contact = mongoose.model("Contact", contactSchema);
+const Order = mongoose.model("Order", orderSchema);
 const User = mongoose.model("User", userSchema);
-
-
-app.get("/api/books", async (req, res) => {
-  try {
-    const books = await Book.find();
-    res.json(books);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 
 // ======================================
 // GET BOOK BY ID
@@ -390,7 +384,16 @@ app.post("/api/forgot-password", async (req, res) => {
     }
 
 });
+app.put("/api/profile/:id", async (req, res) => {
 
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+    );
+
+    res.json(user);
+});
 
 
 // ======================================

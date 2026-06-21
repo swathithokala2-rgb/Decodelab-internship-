@@ -6,16 +6,17 @@
 </head>
 <body>
 
-<div class="profile-container">
+<h2>My Profile</h2>
 
-    <h2>User Profile</h2>
+<input type="text" id="address" placeholder="Address">
+<input type="text" id="city" placeholder="City">
+<input type="text" id="state" placeholder="State">
+<input type="text" id="pincode" placeholder="Pincode">
+<input type="text" id="phone" placeholder="Phone Number">
 
-    <h3 id="profileName"></h3>
-    <p id="profileEmail"></p>
+<button onclick="saveProfile()">Save</button>
 
-    <button onclick="logout()">Logout</button>
-
-</div>
+<div id="profile"></div>
 
 <script src="profile.js"></script>
 
