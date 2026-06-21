@@ -8,15 +8,17 @@ const app = express();
 const SECRET_KEY = "bookstore_secret_key";
 const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
-app.use(cors());
-app.use(express.json());
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "yourgmail@gmail.com",
-        pass: "your-app-password"
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
+
+app.use(cors());
+app.use(express.json());
+
 
 // ======================================
 // SCHEMAS
@@ -69,41 +71,52 @@ app.get("/api/books", async (req, res) => {
 // GET BOOK BY ID
 // ======================================
 
-app.get("/api/books/:id", (req, res) => {
+app.get("/api/books/:id", async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
 
-  const id = parseInt(req.params.id);
+    if (!book) {
+      return res.status(404).json({
+        message: "Book not found"
+      });
+    }
 
-  const book = books.find(
-    b => b.id === id
-  );
+    res.json(book);
 
-  if (!book) {
-    return res.status(404).json({
-      success: false,
-      message: "Book not found"
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
     });
   }
-
-  res.json(book);
 });
-
 
 // ======================================
 // SEARCH BOOKS
 // ======================================
 
-app.get("/api/search", (req, res) => {
+app.get("/api/search", async (req, res) => {
 
-  const keyword =
-    req.query.title?.toLowerCase() || "";
+  try {
 
-  const result = books.filter(book =>
-    book.title.toLowerCase().includes(keyword)
-  );
+    const keyword = req.query.title || "";
 
-  res.json(result);
+    const books = await Book.find({
+      title: {
+        $regex: keyword,
+        $options: "i"
+      }
+    });
+
+    res.json(books);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
 });
-
 
 // ======================================
 // ADD BOOK
@@ -393,6 +406,31 @@ app.get("/api/orders", async (req, res) => {
     res.json(orders);
 
  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+
+});
+app.put("/api/books/:id", async (req, res) => {
+
+  try {
+
+    const book =
+      await Book.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+      );
+
+    res.json({
+      message: "Book Updated Successfully",
+      data: book
+    });
+
+  } catch (error) {
 
     res.status(500).json({
       message: error.message
